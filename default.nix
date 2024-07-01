@@ -10,8 +10,16 @@ in {
     shell = pkgs.mkShell {
         name = "project-shell";
         buildInputs = [
-          #pkgs.go
-          #pkgs.golangci-lint
+          pkgs.go
+          pkgs.golangci-lint
+          pkgs.xcaddy
+          pkgs.caddy
         ];
+        shellHook = ''
+          mkdir -p .dev-home
+          echo '*' > .dev-home/.gitignore
+          export XDG_CONFIG_HOME=$(pwd)/.dev-home/config
+          export XDG_DATA_HOME=$(pwd)/.dev-home/data
+        '';
     };
 }

@@ -1,0 +1,12 @@
+{
+	debug
+	admin off
+	log {
+		level debug
+	}
+}
+
+http://localhost:8000 {
+	root * ./examples/static
+	file_server
+}

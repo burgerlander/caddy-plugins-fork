@@ -1,0 +1,4 @@
+# https://github.com/golangci/golangci-lint/issues/4733
+linters-settings:
+  errcheck:
+    ignore : ""
