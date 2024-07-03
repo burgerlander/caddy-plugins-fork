@@ -1,0 +1,15 @@
+{{ $pathSplit := splitList "/" .OriginalReq.URL.Path }}
+{{ $base := last $pathSplit | default "index.html" }}
+{{ $newBase := trimSuffix (ext $base) $base | printf "%s.gmi" }}
+{{ $filePath := append (initial $pathSplit) $newBase | join "/" | printf "static%s" }}
+{{ if not (fileExists $filePath) }}{{ httpError 404 }}{{ end }}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TODO Title</title>
+    <link rel="stylesheet" type="text/css" href="/bamboo.css" />
+  </head>
+  <body>
+    {{ gemtext (include $filePath) }}
+  </body>
+</html>

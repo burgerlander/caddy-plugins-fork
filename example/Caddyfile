@@ -1,12 +1,29 @@
 {
 	debug
 	admin off
-	log {
-		level debug
-	}
+	auto_https off
+	http_port 8000
 }
 
-http://localhost:8000 {
-	root * ./examples/static
-	file_server
+http://template.localhost {
+	root example/static
+
+	# If the path exists in the static directory then serve it directly
+	@static file {path} {path}/
+	route @static {
+		file_server
+	}
+
+	# Otherwise send it through the template, which will look for a matching gmi
+	# file to render.
+	route {
+		rewrite * /tpl/render_gemtext.html
+		root example
+		templates {
+			extensions {
+				gemtext
+			}
+		}
+		file_server
+	}
 }

@@ -32,6 +32,7 @@ import (
 	caddycmd "github.com/caddyserver/caddy/v2/cmd"
 
 	// plug in Caddy modules here
+	_ "dev.mediocregopher.com/mediocre-caddy-plugins.git"
 	_ "github.com/caddyserver/caddy/v2/modules/standard"
 )
 

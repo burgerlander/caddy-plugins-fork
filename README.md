@@ -2,6 +2,34 @@
 
 TODO proper introduction
 
+## Build
+
+TODO
+
+## Plugins
+
+The following plugins are implemented in this module.
+
+### http.handlers.templates.functions.gemtext
+
+This extension to `templates` allows for rendering a [gemtext][gemtext] string
+as a roughly equivalent set of HTML tags. It is similar to the [markdown template
+function][mdfunc] in its usage. It can be enabled by being included in the
+`templates.extensions` set.
+
+```
+templates {
+    extensions {
+        gemtext
+    }
+}
+```
+
+See the `template.localhost` virtual host in `example/Caddyfile` for an example
+of using the `gemtext` template to render a gemtext file within an HTML file.
+
+[gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
+
 ## Development
 
 A nix-based development environment is provided with the correct versions of all
