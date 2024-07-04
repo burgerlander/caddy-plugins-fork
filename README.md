@@ -25,8 +25,20 @@ templates {
 }
 ```
 
-See the `template.localhost` virtual host in `example/Caddyfile` for an example
-of using the `gemtext` template to render a gemtext file within an HTML file.
+Within a template being rendered the `gemtext` function will be available and
+can be passed any string. The function will return a struct with the following
+fields:
+
+* `Body`: The result of converting each line of the input string into an
+  equivalent line of HTML. This will not include any wrapping HTML tags like
+  `<div>` or `<body>`.
+
+* `Title`: A suggested title, based on the first `# Header` line found in the
+  gemtext input.
+
+See the `template.localhost` virtual host in `example/Caddyfile`, and the
+associated `example/tpl/render_gemtext.html` template file, for an example of
+how to use the template function.
 
 [gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
 [mdfunc]: https://caddyserver.com/docs/modules/http.handlers.templates#markdown

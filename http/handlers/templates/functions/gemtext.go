@@ -51,10 +51,16 @@ func sanitizeText(str string) string {
 	return html.EscapeString(strings.TrimSpace(str))
 }
 
-func (*Gemtext) funcGemtext(input any) (string, error) {
+type gemtextResult struct {
+	Title string
+	Body  string
+}
+
+func (*Gemtext) funcGemtext(input any) (gemtextResult, error) {
 	var (
 		r         = bufio.NewReader(strings.NewReader(caddy.ToString(input)))
 		w         = new(bytes.Buffer)
+		title     string
 		pft, list bool
 		writeErr  error
 	)
@@ -69,7 +75,7 @@ func (*Gemtext) funcGemtext(input any) (string, error) {
 loop:
 	for {
 		if writeErr != nil {
-			return "", fmt.Errorf("writing line: %w", writeErr)
+			return gemtextResult{}, fmt.Errorf("writing line: %w", writeErr)
 		}
 
 		line, err := r.ReadString('\n')
@@ -79,7 +85,7 @@ loop:
 			break loop
 
 		case err != nil:
-			return "", fmt.Errorf("reading next line: %w", err)
+			return gemtextResult{}, fmt.Errorf("reading next line: %w", err)
 
 		case strings.HasPrefix(line, "```"):
 			if !pft {
@@ -132,7 +138,11 @@ loop:
 			write("<h2>%s</h2>\n", sanitizeText(line[2:]))
 
 		case strings.HasPrefix(line, "#"):
-			write("<h1>%s</h1>\n", sanitizeText(line[1:]))
+			line = sanitizeText(line[1:])
+			if title == "" {
+				title = line
+			}
+			write("<h1>%s</h1>\n", line)
 
 		case strings.HasPrefix(line, ">"):
 			write("<blockquote>%s</blockquote>\n", sanitizeText(line[1:]))
@@ -143,7 +153,10 @@ loop:
 		}
 	}
 
-	return w.String(), nil
+	return gemtextResult{
+		Title: title,
+		Body:  w.String(),
+	}, nil
 }
 
 // UnmarshalCaddyfile implements caddyfile.Unmarshaler.
