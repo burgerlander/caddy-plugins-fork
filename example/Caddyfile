@@ -26,7 +26,9 @@ http://template.localhost {
 			# Include the gemtext extention to make the gemtext function
 			# available within the template.
 			extensions {
-				gemtext
+				gemtext {
+					gateway_url "https://gemini.tildeverse.org/?gemini://"
+				}
 			}
 		}
 

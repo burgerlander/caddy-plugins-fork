@@ -20,10 +20,44 @@ function][mdfunc] in its usage. It can be enabled by being included in the
 ```text
 templates {
     extensions {
-        gemtext
+        gemtext {
+            # All parameters are optional
+            gateway_url "https://some.gateway/x/"
+        }
     }
 }
 ```
+
+See the `template.localhost` virtual host in `example/Caddyfile`, and the
+associated `example/tpl/render_gemtext.html` template file, for an example of
+how to use this directive.
+
+[gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
+[mdfunc]: https://caddyserver.com/docs/modules/http.handlers.templates#markdown
+
+#### Parameters
+
+Optional parameters to the gemtext extension include:
+
+**gateway_url**
+
+If given then any `gemini://` URLs encountered as links within
+the document will be appended to this URL, having their `gemini://` scheme
+stripped off first.
+
+e.g. if `gateway_url` is `https://some.gateway/x/` then the following line:
+
+```text
+=> gemini://geminiprotocol.net Check it out!
+```
+
+becomes
+
+```html
+<a href="https://some.gateway/x/geminiprotocol.net">Check it out!</a>
+```
+
+#### Template function
 
 Within a template being rendered the `gemtext` function will be available and
 can be passed any string. The function will return a struct with the following
@@ -35,13 +69,6 @@ fields:
 
 * `Title`: A suggested title, based on the first `# Header` line found in the
   gemtext input.
-
-See the `template.localhost` virtual host in `example/Caddyfile`, and the
-associated `example/tpl/render_gemtext.html` template file, for an example of
-how to use the template function.
-
-[gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
-[mdfunc]: https://caddyserver.com/docs/modules/http.handlers.templates#markdown
 
 ## Development
 

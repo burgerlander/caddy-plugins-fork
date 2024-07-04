@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"io"
+	"net/url"
 	"strings"
 	"text/template"
 
@@ -30,7 +31,22 @@ func init() {
 	)
 }
 
-type Gemtext struct{}
+type Gemtext struct {
+
+	// If given then any `gemini://` URLs encountered as links within the
+	// document will be appended to this URL, having their `gemini://` scheme
+	// stripped off first.
+	//
+	// e.g. if `gateway_url` is `https://some.gateway/x/` then the following
+	// line:
+	//
+	//	=> gemini://geminiprotocol.net Check it out!
+	//
+	// becomes
+	//
+	//	<a href="https://some.gateway/x/geminiprotocol.net">Check it out!</a>
+	GatewayURL string `json:"gateway_url,omitempty"`
+}
 
 var _ templates.CustomFunctions = (*Gemtext)(nil)
 
@@ -56,7 +72,7 @@ type gemtextResult struct {
 	Body  string
 }
 
-func (*Gemtext) funcGemtext(input any) (gemtextResult, error) {
+func (g *Gemtext) funcGemtext(input any) (gemtextResult, error) {
 	var (
 		r         = bufio.NewReader(strings.NewReader(caddy.ToString(input)))
 		w         = new(bytes.Buffer)
@@ -126,9 +142,17 @@ loop:
 				urlStr = line
 				label  = urlStr
 			)
+
 			if i := strings.IndexAny(urlStr, " \t"); i > -1 {
 				urlStr, label = urlStr[:i], sanitizeText(urlStr[i:])
 			}
+
+			if g.GatewayURL != "" {
+				if u, err := url.Parse(urlStr); err == nil && u.Scheme == "gemini" {
+					urlStr = g.GatewayURL + u.Host + u.Path
+				}
+			}
+
 			write("<p><a href=\"%s\">%s</a></p>\n", urlStr, label)
 
 		case strings.HasPrefix(line, "###"):
@@ -160,7 +184,23 @@ loop:
 }
 
 // UnmarshalCaddyfile implements caddyfile.Unmarshaler.
-func (*Gemtext) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
+func (g *Gemtext) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 	d.Next() // consume directive name
+
+	for nesting := d.Nesting(); d.NextBlock(nesting); {
+		v := d.Val()
+		switch v {
+		case "gateway_url":
+			if !d.Args(&g.GatewayURL) {
+				return d.ArgErr()
+			} else if _, err := url.Parse(g.GatewayURL); err != nil {
+				return fmt.Errorf("invalid gateway url: %w", err)
+			}
+
+		default:
+			return fmt.Errorf("unknown directive %q", v)
+		}
+	}
+
 	return nil
 }
