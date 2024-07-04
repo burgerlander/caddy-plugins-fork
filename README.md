@@ -4,7 +4,25 @@ TODO proper introduction
 
 ## Build
 
-TODO
+A Caddy binary with these plugins included can be built using the
+[xcaddy][xcaddy] tool:
+
+```bash
+xcaddy build --with dev.mediocregopher.com/mediocre-caddy-plugins.git
+```
+
+If you want just a specific plugin you can choose it using its module path:
+
+```bash
+xcaddy build \
+    --with dev.mediocregopher.com/mediocre-caddy-plugins.git/http/handlers/templates/functions
+```
+
+It's also possible to build Caddy manually using a custom `main.go` file, see
+[the example from the caddy repo][caddymain].
+
+[xcaddy]: https://github.com/caddyserver/xcaddy
+[caddymain]: https://github.com/caddyserver/caddy/blob/master/cmd/caddy/main.go
 
 ## Plugins
 
