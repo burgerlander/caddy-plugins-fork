@@ -1,7 +1,6 @@
-{{ $pathSplit := splitList "/" .OriginalReq.URL.Path }}
-{{ $base := last $pathSplit | default "index.html" }}
-{{ $newBase := trimSuffix (ext $base) $base | printf "%s.gmi" }}
-{{ $filePath := append (initial $pathSplit) $newBase | join "/" | printf "static%s" }}
+{{ $pathSplit := splitList "/" .Req.URL.Path }}
+{{ $base := last $pathSplit | default "index.gmi" }}
+{{ $filePath := append (initial $pathSplit) $base | join "/" | printf "static%s" }}
 {{ if not (fileExists $filePath) }}{{ httpError 404 }}{{ end }}
 <!DOCTYPE html>
 <html>

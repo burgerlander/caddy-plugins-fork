@@ -1,0 +1,5 @@
+# Gemtext Directory Index
+
+This is the index of the gemtext directory. In here are various gemtext files useful for testing.
+
+=> cheatsheet.gmi Gemtext cheatsheet

@@ -8,22 +8,36 @@
 http://template.localhost {
 	root example/static
 
-	# If the path exists in the static directory then serve it directly
-	@static file {path} {path}/
-	route @static {
-		file_server
-	}
+	# If a directory has an index.gmi file, then that file will be served when
+	# the directory is requested.
+	try_files {path} {path}/index.gmi
 
-	# Otherwise send it through the template, which will look for a matching gmi
-	# file to render.
-	route {
-		rewrite * /tpl/render_gemtext.html
-		root example
+	@gmi path_regexp \.gmi$
+
+	# Handle all requests for .gmi files specially.
+	route @gmi {
+
 		templates {
+			# The templates directive is given a different root, so that other
+			# template snippets within the tpl directory could theoretically be
+			# used within render_gemtext.html.
+			root example
+
+			# Include the gemtext extention to make the gemtext function
+			# available within the template.
 			extensions {
 				gemtext
 			}
 		}
-		file_server
+
+		# We "respond" with a template body here, which will be processed by the
+		# templates directive above. This body simply imports the template we
+		# actually want. Setting Content-Type is required because there's no
+		# actual file for Caddy to determine the value from.
+		header Content-Type text/html
+		respond `{{ include "tpl/render_gemtext.html" }}`
 	}
+
+	# All other files are handled directly by the file_server.
+	file_server
 }
