@@ -1,6 +1,6 @@
 # mediocre-caddy-plugins
 
-TODO proper introduction
+Plugins to the Caddy webserver which I've developed for myself.
 
 ## Build
 
@@ -46,8 +46,8 @@ templates {
 }
 ```
 
-See the `template.localhost` virtual host in `example/Caddyfile`, and the
-associated `example/tpl/render_gemtext.html` template file, for an example of
+See the `template.localhost` virtual host in `./example/Caddyfile`, and the
+associated `./example/tpl/render_gemtext.html` template file, for an example of
 how to use this directive.
 
 [gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
@@ -101,7 +101,7 @@ The `./cmd/mediocre-caddy` binary package can be used to run a Caddy instance
 with all plugins provided by this package pre-installed.
 
 The Caddyfile `./example/Caddyfile` can be used to spin up a Caddy instance with
-various virtual-hosts predefined with usefule configurations for testing. See
+various virtual-hosts predefined with useful configurations for testing. See
 that file for a description of the available virtual hosts.
 
 ```bash
