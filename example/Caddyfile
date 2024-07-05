@@ -12,7 +12,7 @@ http://template.localhost {
 	# the directory is requested.
 	try_files {path} {path}/index.gmi
 
-	@gmi path_regexp \.gmi$
+	@gmi path *.gmi
 
 	# Handle all requests for .gmi files specially.
 	route @gmi {
@@ -36,7 +36,7 @@ http://template.localhost {
 		# templates directive above. This body simply imports the template we
 		# actually want. Setting Content-Type is required because there's no
 		# actual file for Caddy to determine the value from.
-		header Content-Type text/html
+		header Content-Type "text/html; charset=utf-8"
 		respond `{{ include "tpl/render_gemtext.html" }}`
 	}
 
