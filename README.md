@@ -94,7 +94,7 @@ A nix-based development environment is provided with the correct versions of all
 development dependencies. It can be activated by doing:
 
 ```bash
-nix-shell -A shell
+nix-shell
 ```
 
 The `./cmd/mediocre-caddy` binary package can be used to run a Caddy instance
