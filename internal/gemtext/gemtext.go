@@ -74,7 +74,7 @@ loop:
 			continue
 
 		case pft:
-			write(line)
+			write(html.EscapeString(line))
 			continue
 
 		case len(strings.TrimSpace(line)) == 0:

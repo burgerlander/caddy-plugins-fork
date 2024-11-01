@@ -59,4 +59,8 @@ Here's a quote from Maciej Cegłowski:
 
 ## Pre-fromatted text
 
-Lines which start with ``` will cause clients to toggle in and out of ordinary rendering mode and preformatted mode.  In preformatted mode, Gemtext syntax is ignored so links etc. will not be rendered, and text will appear in a monospace font.
+Lines which start with ``` will cause clients to toggle in and out of ordinary rendering mode and preformatted mode. In preformatted mode, Gemtext syntax is ignored so links etc. will not be rendered, and text will appear in a monospace font.
+
+```
+<script>alert("HTML tags should not get rendered!")</script>
+```
