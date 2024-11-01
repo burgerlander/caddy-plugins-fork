@@ -1,15 +1,10 @@
-{{ $pathSplit := splitList "/" .Req.URL.Path }}
-{{ $base := last $pathSplit | default "index.gmi" }}
-{{ $filePath := append (initial $pathSplit) $base | join "/" | printf "static%s" }}
-{{ if not (fileExists $filePath) }}{{ httpError 404 }}{{ end }}
-{{ $gemtextRes := gemtext (include $filePath) }}
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{ $gemtextRes.Title | default "Example Gemtext File" }}</title>
+    <title>{{ .Title | default "Example Gemtext File" }}</title>
     <link rel="stylesheet" type="text/css" href="/bamboo.css" />
   </head>
   <body>
-    {{ $gemtextRes.Body }}
+    {{ .Body }}
   </body>
 </html>

@@ -28,7 +28,68 @@ It's also possible to build Caddy manually using a custom `main.go` file, see
 
 The following plugins are implemented in this module.
 
-### http.handlers.templates.functions.gemtext
+### http.handlers.gemtext
+
+This HTTP handler will translate [gemtext][gemtext] documents into HTML
+documents. It requires at least one argument, `template`, to which is passed an
+HTML template file that gemtext documents will be rendered into.
+
+Only responses with a `Content-Type` of `text/gemini` will be modified by this
+module.
+
+Example usage:
+
+```
+http://gemtext.localhost {
+	root example/static
+	gemtext {
+		root example/tpl
+		template render_gemtext.html
+	}
+	file_server
+}
+```
+
+#### Parameters
+
+**template**
+
+Path to the template which will be used to render the HTML page, relative to the
+`root`.
+
+The template will be rendered with these extra data fields:
+
+* `.Title`: The Title of the gemini document, determined based on the first
+  primary header (single `#` prefix) found. This will be an empty string if no
+  primary header is found.
+
+* `.Body`: A string containing all rendered HTML DOM elements.
+
+**link_template**
+
+Path to a template which will be used for rendering links. If not given then
+links will be rendered using an anchor tag wrapped in a paragraph tag.
+
+The template will be rendered with these extra data fields:
+
+* `.URL`: The URL the link points to.
+* `.Label`: The label attached to the link. If the original link had no label
+  then this will be equivalent to `.URL`.
+
+**root**
+
+The root path from which to load templaet files. Default is `{http.vars.root}`
+if set, or current working directory otherwise.
+
+**delimiters**
+
+The template action delimiters. Defaults to:
+
+```
+delimiters "{{" "}}"
+```
+
+### http.handlers.templates.functions.gemtext_function
 
 This extension to `templates` allows for rendering a [gemtext][gemtext] string
 as a roughly equivalent set of HTML tags. It is similar to the [markdown template
@@ -38,7 +99,7 @@ function][mdfunc] in its usage. It can be enabled by being included in the
 ```text
 templates {
     extensions {
-        gemtext {
+        gemtext_function {
             # All parameters are optional
             gateway_url "https://some.gateway/x/"
         }
@@ -50,12 +111,11 @@ See the `template.localhost` virtual host in `./example/Caddyfile`, and the
 associated `./example/tpl/render_gemtext.html` template file, for an example of
 how to use this directive.
 
-[gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
 [mdfunc]: https://caddyserver.com/docs/modules/http.handlers.templates#markdown
 
 #### Parameters
 
-Optional parameters to the gemtext extension include:
+Optional parameters to the `gemtext_function` extension include:
 
 **gateway_url**
 
@@ -87,6 +147,8 @@ fields:
 
 * `Title`: A suggested title, based on the first `# Header` line found in the
   gemtext input.
+
+[gemtext]: https://geminiprotocol.net/docs/gemtext.gmi
 
 ## Development
 

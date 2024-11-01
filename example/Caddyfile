@@ -5,7 +5,22 @@
 	http_port 8000
 }
 
-http://template.localhost {
+http://gemtext.localhost {
+	root example/static
+
+	# Allow for either index.html or index.gmi files when serving directories
+	try_files {path} {path}/index.html {path}/index.gmi
+
+	gemtext {
+		root example/tpl
+		template render_gemtext.html
+		link_template render_gemtext_link.html
+	}
+
+	file_server
+}
+
+http://templates.localhost {
 	root example/static
 
 	# If a directory has an index.gmi file, then that file will be served when
@@ -20,13 +35,13 @@ http://template.localhost {
 		templates {
 			# The templates directive is given a different root, so that other
 			# template snippets within the tpl directory could theoretically be
-			# used within render_gemtext.html.
+			# used within render_gemtext_with_templates.html.
 			root example
 
 			# Include the gemtext extention to make the gemtext function
 			# available within the template.
 			extensions {
-				gemtext {
+				gemtext_function {
 					gateway_url "https://gemini.tildeverse.org/?gemini://"
 				}
 			}
@@ -37,7 +52,7 @@ http://template.localhost {
 		# actually want. Setting Content-Type is required because there's no
 		# actual file for Caddy to determine the value from.
 		header Content-Type "text/html; charset=utf-8"
-		respond `{{ include "tpl/render_gemtext.html" }}`
+		respond `{{ include "tpl/render_gemtext_with_templates.html" }}`
 	}
 
 	# All other files are handled directly by the file_server.

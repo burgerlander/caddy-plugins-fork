@@ -18,7 +18,7 @@ import (
 func init() {
 	caddy.RegisterModule(Gemtext{})
 	httpcaddyfile.RegisterDirective(
-		"gemtext",
+		"gemtext_function",
 		func(h httpcaddyfile.Helper) ([]httpcaddyfile.ConfigValue, error) {
 			var f Gemtext
 			err := f.UnmarshalCaddyfile(h.Dispenser)
@@ -56,7 +56,7 @@ func (f *Gemtext) CustomTemplateFunctions() template.FuncMap {
 
 func (Gemtext) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
-		ID:  "http.handlers.templates.functions.gemtext",
+		ID:  "http.handlers.templates.functions.gemtext_function",
 		New: func() caddy.Module { return new(Gemtext) },
 	}
 }

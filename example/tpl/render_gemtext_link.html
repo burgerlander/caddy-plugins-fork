@@ -1,0 +1,5 @@
+{{- $url := .URL }}
+{{- if (hasPrefix "gemini://" $url) }}
+  {{- $url = printf "https://gemini.tildeverse.org/?%s" $url }}
+{{- end }}
+<p><a href="{{ $url }}">{{ .Label }}</a></p>
