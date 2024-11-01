@@ -39,7 +39,7 @@ module.
 
 Example usage:
 
-```
+```text
 http://gemtext.localhost {
 	root example/static
 	gemtext {
@@ -85,7 +85,7 @@ if set, or current working directory otherwise.
 
 The template action delimiters. Defaults to:
 
-```
+```text
 delimiters "{{" "}}"
 ```
 
