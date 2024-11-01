@@ -75,10 +75,11 @@ func (g *Gemtext) funcGemtext(input any) (gemtext.HTML, error) {
 		translator.RenderLink = func(w io.Writer, urlStr, label string) error {
 			if u, err := url.Parse(urlStr); err == nil && u.Scheme == "gemini" {
 				urlStr = g.GatewayURL + u.Host + u.Path
+				label += " (proxied)"
 			}
 
 			_, err := fmt.Fprintf(
-				w, "<p><a href=\"%s\">%s (proxied)</a></p>\n", urlStr, label,
+				w, "<p><a href=\"%s\">%s</a></p>\n", urlStr, label,
 			)
 			return err
 		}
