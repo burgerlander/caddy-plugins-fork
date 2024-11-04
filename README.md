@@ -65,6 +65,17 @@ The template will be rendered with these extra data fields:
 
 * `.Body`: A string containing all rendered HTML DOM elements.
 
+**heading_template**
+
+Path to a template which will be used for rendering headings. If not given then
+headings will be rendered with appropriate HTML header tags.
+
+The template will be rendered with these extra data fields:
+
+* `.Level`: Which level of heading is being rendered, 1, 2, or 3.
+
+* `.Text`: The text of the heading.
+
 **link_template**
 
 Path to a template which will be used for rendering links. If not given then

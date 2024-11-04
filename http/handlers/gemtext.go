@@ -64,6 +64,20 @@ type Gemtext struct {
 	//
 	TemplatePath string `json:"template"`
 
+	// Path to a template which will be used for rendering headings. If not
+	// given then headings will be rendered with appropriate HTML header tags.
+	//
+	// The template will be rendered with these extra data fields:
+	//
+	// ##### `.Level`
+	//
+	// Which level of heading is being rendered, 1, 2, or 3.
+	//
+	// ##### `.Text`
+	//
+	// The text of the heading.
+	HeadingTemplatePath string `json:"heading_template"`
+
 	// Path to a template which will be used for rendering links. If not given
 	// then links will be rendered using an anchor tag wrapped in a paragraph
 	// tag.
@@ -181,9 +195,23 @@ func (g *Gemtext) ServeHTTP(
 			Req:        r,
 			RespHeader: templates.WrappedHeader{Header: rec.Header()},
 		}
+
+		parser gemtext.HTMLTranslator
 	)
 
-	parser := gemtext.HTMLTranslator{}
+	if g.HeadingTemplatePath != "" {
+		parser.RenderHeading = func(w io.Writer, level int, text string) error {
+			payload := struct {
+				*templates.TemplateContext
+				Level int
+				Text  string
+			}{
+				ctx, level, text,
+			}
+
+			return g.render(w, ctx, osFS, g.HeadingTemplatePath, payload)
+		}
+	}
 
 	if g.LinkTemplatePath != "" {
 		parser.RenderLink = func(w io.Writer, url, label string) error {
@@ -256,6 +284,10 @@ func gemtextParseCaddyfile(h httpcaddyfile.Helper) (caddyhttp.MiddlewareHandler,
 		switch h.Val() {
 		case "template":
 			if !h.Args(&g.TemplatePath) {
+				return nil, h.ArgErr()
+			}
+		case "heading_template":
+			if !h.Args(&g.HeadingTemplatePath) {
 				return nil, h.ArgErr()
 			}
 		case "link_template":

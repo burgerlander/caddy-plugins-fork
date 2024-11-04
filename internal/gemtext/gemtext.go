@@ -14,6 +14,11 @@ import (
 // HTMLTranslator is used to translate a gemtext file into equivalent HTML DOM
 // elements.
 type HTMLTranslator struct {
+	// RenderHeading, if given can be used to override how headings are
+	// rendered. The level indicates which heading level is being rendered: 1,
+	// 2, or 3.
+	RenderHeading func(w io.Writer, level int, text string) error
+
 	// RenderLink, if given, can be used to override how links are rendered.
 	RenderLink func(w io.Writer, url, label string) error
 }
@@ -45,7 +50,7 @@ func (t HTMLTranslator) Translate(src io.Reader) (HTML, error) {
 		if writeErr != nil {
 			return
 		}
-		fmt.Fprintf(w, fmtStr, args...)
+		_, writeErr = fmt.Fprintf(w, fmtStr, args...)
 	}
 
 loop:
@@ -109,25 +114,36 @@ loop:
 			if t.RenderLink == nil {
 				write("<p><a href=\"%s\">%s</a></p>\n", urlStr, label)
 			} else {
-				if err := t.RenderLink(w, urlStr, label); err != nil {
-					return HTML{}, fmt.Errorf(
-						"rendering link %q (label:%q): %w", urlStr, label, err,
-					)
-				}
+				writeErr = t.RenderLink(w, urlStr, label)
 			}
 
 		case strings.HasPrefix(line, "###"):
-			write("<h3>%s</h3>\n", sanitizeText(line[3:]))
+			text := sanitizeText(line[3:])
+			if t.RenderHeading == nil {
+				write("<h3>%s</h3>\n", text)
+			} else {
+				writeErr = t.RenderHeading(w, 3, text)
+			}
 
 		case strings.HasPrefix(line, "##"):
-			write("<h2>%s</h2>\n", sanitizeText(line[2:]))
+			text := sanitizeText(line[2:])
+			if t.RenderHeading == nil {
+				write("<h2>%s</h2>\n", text)
+			} else {
+				writeErr = t.RenderHeading(w, 2, text)
+			}
 
 		case strings.HasPrefix(line, "#"):
-			line = sanitizeText(line[1:])
+			text := sanitizeText(line[1:])
 			if title == "" {
-				title = line
+				title = text
 			}
-			write("<h1>%s</h1>\n", line)
+
+			if t.RenderHeading == nil {
+				write("<h1>%s</h1>\n", text)
+			} else {
+				writeErr = t.RenderHeading(w, 1, text)
+			}
 
 		case strings.HasPrefix(line, ">"):
 			write("<blockquote>%s</blockquote>\n", sanitizeText(line[1:]))
