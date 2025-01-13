@@ -89,7 +89,7 @@ The template will be rendered with these extra data fields:
 
 **root**
 
-The root path from which to load templaet files. Default is `{http.vars.root}`
+The root path from which to load template files. Default is `{http.vars.root}`
 if set, or current working directory otherwise.
 
 **delimiters**
@@ -108,7 +108,7 @@ an appropriate conversion from there.
 
 Example usage:
 
-```
+```text
 handle_path /gmisub.xml {
 	# Rewrite the request path to point to the gemlog file
 	rewrite /gmisub.gmi
