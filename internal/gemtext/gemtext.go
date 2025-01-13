@@ -102,14 +102,10 @@ loop:
 		switch {
 		case strings.HasPrefix(line, "=>"):
 			var (
-				line   = strings.TrimSpace(line[2:])
-				urlStr = line
-				label  = urlStr
+				parsedLink = parseLinkLine(line)
+				urlStr     = parsedLink.url
+				label      = sanitizeText(parsedLink.label)
 			)
-
-			if i := strings.IndexAny(urlStr, " \t"); i > -1 {
-				urlStr, label = urlStr[:i], sanitizeText(urlStr[i:])
-			}
 
 			if t.RenderLink == nil {
 				write("<p><a href=\"%s\">%s</a></p>\n", urlStr, label)

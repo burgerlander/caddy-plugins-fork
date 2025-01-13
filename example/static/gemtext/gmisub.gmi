@@ -1,0 +1,15 @@
+# Gemini Subscription Format
+
+This document contains a set of links provided in the gemini subscription format convetion.
+
+=> gemini://geminiprotocol.net/docs/companion/subscription.gmi Subscribing to Gemini pages
+
+This page is intended for testing the processing of documents which match this convention, and so the links don't go anywhere.
+
+=> foo/foo.gmi 2025-01-04 - Foo (relative)
+
+=> /bar.gmi 2025-01-03 - Bar (absolute)
+
+=> http://example.com/baz.gmi 2025-01-02 - Baz (Remote HTTP URL)
+
+=> gemini://example.com/buz.gmi 2025-01-01 - Buz (Remote Gemini URL)

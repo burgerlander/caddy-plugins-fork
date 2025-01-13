@@ -11,13 +11,44 @@ http://gemtext.localhost {
 	# Allow for either index.html or index.gmi files when serving directories
 	try_files {path} {path}/index.html {path}/index.gmi
 
-	gemtext {
-		root example/tpl
-		template render_gemtext.html
-		link_template render_gemtext_link.html
+	handle_path /gemtext/gmisub.rss.xml {
+		rewrite /gemtext/gmisub.gmi
+		gemlog_to_feed {
+			format rss
+			author_name "Tester"
+			author_email "nun@ya.biz"
+		}
+		file_server
 	}
 
-	file_server
+	handle_path /gemtext/gmisub.atom.xml {
+		rewrite /gemtext/gmisub.gmi
+		gemlog_to_feed {
+			format atom
+			author_name "Tester"
+			author_email "nun@ya.biz"
+		}
+		file_server
+	}
+
+	handle_path /gemtext/gmisub.json {
+		rewrite /gemtext/gmisub.gmi
+		gemlog_to_feed {
+			format json
+			author_name "Tester"
+			author_email "nun@ya.biz"
+		}
+		file_server
+	}
+
+	handle {
+		gemtext {
+			root example/tpl
+			template render_gemtext.html
+			link_template render_gemtext_link.html
+		}
+		file_server
+	}
 }
 
 http://templates.localhost {

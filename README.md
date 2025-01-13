@@ -100,6 +100,53 @@ The template action delimiters. Defaults to:
 delimiters "{{" "}}"
 ```
 
+### http.handlers.gemlog_to_feed
+
+This module will convert a gemtext response document into an RSS, Atom, or JSON
+feed, by first intepreting the gemtext document as a [gemlog][gemlog] and making
+an appropriate conversion from there.
+
+Example usage:
+
+```
+handle_path /gmisub.xml {
+	# Rewrite the request path to point to the gemlog file
+	rewrite /gmisub.gmi
+
+	# Convert the response from file_server, which is the gemlog file itself,
+	# into an ATOM feed.
+	gemlog_to_feed {
+		format atom
+		author_name "Tester"
+		author_email "nun@ya.biz"
+	}
+
+	file_server
+}
+```
+
+#### Parameters
+
+**format**
+
+Optional format of the feed to output. Can be one of `rss`, `atom`, or `json`,
+defaulting to `atom`.
+
+The `Content-Type` of the response will be set accordingly.
+
+**author_name** and **author_email**
+
+Optional parameters which will be used to populate the top-level author fields
+in the output feed.
+
+**base_url**
+
+Optional URL in format `[scheme://host[:port]]/path` to use as the absolute URL
+all links in the feed will be relative to. If not given then it will be inferred
+from the request.
+
+[gemlog]: https://geminiprotocol.net/docs/companion/subscription.gmi
+
 ### http.handlers.templates.functions.gemtext_function
 
 This extension to `templates` allows for rendering a [gemtext][gemtext] string
