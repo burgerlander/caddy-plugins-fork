@@ -147,6 +147,28 @@ from the request.
 
 [gemlog]: https://geminiprotocol.net/docs/companion/subscription.gmi
 
+### http.handlers.git_remote_repo
+
+This module will serve a git repo using either the [dumb or
+smart][git_transport] HTTP protocols, allowing clients to push to or pull from
+the repo.
+
+This module does _not_ deal with authentication or any other kind of access
+control, take care not to leave your private repos publicly exposed.
+
+[git_transport]: https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+
+```text
+# git_remote_repo requires that the sub-directory in the URL path has already
+# been stripped. handle_path takes care of this.
+handle_path /repo.git/* {
+
+	# Serve the git repository which can be found in the test-repo.git
+	# sub-directory of the site root.
+	git_remote_repo "{http.vars.root}/test-repo.git"
+}
+```
+
 ### http.handlers.templates.functions.gemtext_function
 
 This extension to `templates` allows for rendering a [gemtext][gemtext] string

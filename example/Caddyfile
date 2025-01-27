@@ -5,8 +5,23 @@
 	http_port 8000
 }
 
+http://git-remote-repo.localhost {
+	root example/git-remote-repo
+
+	# git_remote_repo requires that repo's sub-directory in the URL path has
+	# already been stripped. handle_path takes care of this.
+	handle_path /repo.git/* {
+
+		# Serve the git repository which can be found in the test-repo.git
+		# sub-directory of the site root.
+		git_remote_repo "{http.vars.root}/test-repo.git"
+	}
+
+	file_server
+}
+
 http://gemtext.localhost {
-	root example/static
+	root example/gemtext/static
 
 	# Allow for either index.html or index.gmi files when serving directories
 	try_files {path} {path}/index.html {path}/index.gmi
@@ -52,7 +67,7 @@ http://gemtext.localhost {
 }
 
 http://templates.localhost {
-	root example/static
+	root example/gemtext/static
 
 	# If a directory has an index.gmi file, then that file will be served when
 	# the directory is requested.
