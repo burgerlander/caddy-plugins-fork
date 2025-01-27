@@ -165,7 +165,7 @@ handle_path /repo.git/* {
 
 	# Serve the git repository which can be found in the test-repo.git
 	# sub-directory of the site root.
-	git_remote_repo "{http.vars.root}/test-repo.git"
+	git_remote_repo * "{http.vars.root}/test-repo.git"
 }
 ```
 
