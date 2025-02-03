@@ -169,6 +169,82 @@ handle_path /repo.git/* {
 }
 ```
 
+### http.handlers.proof_of_work
+
+This module which will intercept all requests and check that they were made by a
+browser which has performed a proof-of-work (PoW) challenge in the recent past.
+
+Any requests which lack a PoW solution will be redirected to a page where a
+challenge will be automatically solved. The challenge and solution will be
+stored in cookies, and then the browser will be redirected back to the page it
+was originally trying to get to.
+
+The objective of this middleware is to allow normal users to continue using a
+website, while trying to prevent search engine crawlers, denial-of-service
+attacks, and AI scrapers from getting through.
+
+Example Usage:
+
+```text
+proof_of_work [matcher] {
+	# all parameters are optional
+	secret "some secret value"
+	target 0x00FFFFFF
+	challenge_timeout 12h
+	challenge_seed_cookie "__pow_challenge_seed"
+	challenge_solution_cookie "__pow_challenge_solution"
+	template_path "{http.vars.root}/tpl.html"
+}
+```
+
+**secret**
+
+Used to validate a PoW challenge seed. This string should never be shared with
+clients, but _must_ be shared amongst all Caddy servers which are serving the
+same domain.
+
+If not given then one will be generated on startup. Note that in this case
+restarting Caddy will result in all clients requiring a new PoW solution.
+
+**target**
+
+A uint32 indicating how difficult each challenge will be to solve. A _lower_
+Target value is more difficult than a higher one.
+
+Defaults to `0x000FFFFF`.
+
+**challenge_timeout**
+
+How long before Challenges are considered expired and cannot be solved. Any
+solutions are also expired, and browsers will be redirected back to the
+challenge page to solve a new challenge.
+
+Defaults to `12h`.
+
+**challenge_seed_cookie**
+
+The name of the cookie which should be used to store the challenge seed once a
+challenge has been solved.
+
+Defaults to `__pow_challenge_seed`.
+
+**challenge_solution_cookie**
+
+The name of the cookie which should be used to store the challenge solution once
+a challenge has been solved.
+
+Defaults to `__pow_challenge_solution`.
+
+**template**
+
+Path to HTML template to render in the browser when it is being challenged. If
+not given then a simple default is shown.
+
+The template file should include the line
+`<script>{{ template "pow.js" . }}</script>` at the end of the `body`
+tag. This script will solve a challenge, set the solution to a cookie,
+and reload the page.
+
 ### http.handlers.templates.functions.gemtext_function
 
 This extension to `templates` allows for rendering a [gemtext][gemtext] string

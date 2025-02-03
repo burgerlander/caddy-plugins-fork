@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Now hold it right there...</title>
+    <!--
+      add a fake favicon so that one isn't requested without a seed/solution
+    -->
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+  </head>
+  <body style="
+    display: grid;
+    grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+    height: 100vh;
+    width: 100vw;
+  ">
+    <span style="
+      grid-area: 2 / 2 / span 1 / span 1;
+      place-self: center;
+    ">
+      Look, you're getting a proof-of-work check!
+    </span>
+
+    <script>
+      {{ template "pow.js" . }}
+    </script>
+  </body>
+</html>

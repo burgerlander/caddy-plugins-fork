@@ -8,6 +8,13 @@
 http://git-remote-repo.localhost {
 	root example/git-remote-repo
 
+	# Exclude URL paths related to the git v2 smart protocol, so that the git
+	# CLI still works.
+	@pow expression `!path("*/info/refs", "*/git-upload-pack", "*/git-receive-pack")`
+	proof_of_work @pow {
+		template `{http.vars.root}/pow.html`
+	}
+
 	# git_remote_repo requires that repo's sub-directory in the URL path has
 	# already been stripped. handle_path takes care of this.
 	handle_path /repo.git/* {
