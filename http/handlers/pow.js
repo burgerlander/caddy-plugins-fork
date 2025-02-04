@@ -22,8 +22,8 @@ const randBuf = new Uint8Array(fullBuf, seed.byteLength);
     const digestView = new DataView(digest);
     if (digestView.getUint32(0) < target) {
       const solutionStr = toHexString(randBuf);
-      document.cookie = `{{ .ChallengeSeedCookie }}=${seedStr}`;
-      document.cookie = `{{ .ChallengeSolutionCookie }}=${solutionStr}`;
+      document.cookie = `{{ .ChallengeSeedCookie }}=${seedStr}; Path=/`;
+      document.cookie = `{{ .ChallengeSolutionCookie }}=${solutionStr}; Path=/`;
       window.location.reload();
     }
   }
