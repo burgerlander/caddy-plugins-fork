@@ -25,6 +25,11 @@ const randBuf = new Uint8Array(fullBuf, seed.byteLength);
       document.cookie = `{{ .ChallengeSeedCookie }}=${seedStr}; Path=/`;
       document.cookie = `{{ .ChallengeSolutionCookie }}=${solutionStr}; Path=/`;
       window.location.reload();
+
+      // In safari reloading the page doesn't seem to stop async functions which
+      // are already in progress. Which is crazy. But anyway, return to stop the
+      // function.
+      return;
     }
   }
 })();
