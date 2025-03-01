@@ -46,7 +46,14 @@ func (t HTMLTranslator) Translate(src io.Reader) (HTML, error) {
 		return html.EscapeString(strings.TrimSpace(str))
 	}
 
-	write := func(fmtStr string, args ...any) {
+	write := func(str string) {
+		if writeErr != nil {
+			return
+		}
+		_, writeErr = fmt.Fprint(w, str)
+	}
+
+	writef := func(fmtStr string, args ...any) {
 		if writeErr != nil {
 			return
 		}
@@ -91,7 +98,7 @@ loop:
 			if !list {
 				write("<ul>\n")
 			}
-			write("<li>%s</li>\n", sanitizeText(line[1:]))
+			writef("<li>%s</li>\n", sanitizeText(line[1:]))
 			list = true
 			continue
 		} else if list {
@@ -108,7 +115,7 @@ loop:
 			)
 
 			if t.RenderLink == nil {
-				write("<p><a href=\"%s\">%s</a></p>\n", urlStr, label)
+				writef("<p><a href=\"%s\">%s</a></p>\n", urlStr, label)
 			} else {
 				writeErr = t.RenderLink(w, urlStr, label)
 			}
@@ -116,7 +123,7 @@ loop:
 		case strings.HasPrefix(line, "###"):
 			text := sanitizeText(line[3:])
 			if t.RenderHeading == nil {
-				write("<h3>%s</h3>\n", text)
+				writef("<h3>%s</h3>\n", text)
 			} else {
 				writeErr = t.RenderHeading(w, 3, text)
 			}
@@ -124,7 +131,7 @@ loop:
 		case strings.HasPrefix(line, "##"):
 			text := sanitizeText(line[2:])
 			if t.RenderHeading == nil {
-				write("<h2>%s</h2>\n", text)
+				writef("<h2>%s</h2>\n", text)
 			} else {
 				writeErr = t.RenderHeading(w, 2, text)
 			}
@@ -136,17 +143,17 @@ loop:
 			}
 
 			if t.RenderHeading == nil {
-				write("<h1>%s</h1>\n", text)
+				writef("<h1>%s</h1>\n", text)
 			} else {
 				writeErr = t.RenderHeading(w, 1, text)
 			}
 
 		case strings.HasPrefix(line, ">"):
-			write("<blockquote>%s</blockquote>\n", sanitizeText(line[1:]))
+			writef("<blockquote>%s</blockquote>\n", sanitizeText(line[1:]))
 
 		default:
 			line = strings.TrimSpace(line)
-			write("<p>%s</p>\n", line)
+			writef("<p>%s</p>\n", line)
 		}
 	}
 

@@ -5,3 +5,9 @@ This is the index of the gemtext directory. In here are various gemtext files us
 => cheatsheet.gmi Gemtext cheatsheet
 
 => gmisub.gmi Gemini Subscription Format
+
+```
+Some code goes here
+
+A % shouldn't be a problem
+```

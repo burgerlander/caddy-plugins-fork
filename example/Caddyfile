@@ -65,7 +65,7 @@ http://gemtext.localhost {
 
 	handle {
 		gemtext {
-			root example/tpl
+			root example/gemtext/tpl
 			template render_gemtext.html
 			link_template render_gemtext_link.html
 		}
