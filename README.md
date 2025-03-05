@@ -197,6 +197,8 @@ proof_of_work [matcher] {
 }
 ```
 
+#### Parameters
+
 **secret**
 
 Used to validate a PoW challenge seed. This string should never be shared with
@@ -244,6 +246,56 @@ The template file should include the line
 `<script>{{ template "pow.js" . }}</script>` at the end of the `body`
 tag. This script will solve a challenge, set the solution to a cookie,
 and reload the page.
+
+### http.handlers.{request_timing_metric, response_size_metric}
+
+These modules which will passthrough all requests untouched, recording their
+timing under the following histograms [metric][metrics].
+
+* `mediocre_caddy_plugins_http_request_seconds`
+* `mediocre_caddy_plugins_http_response_bytes`
+
+Example Usage:
+
+```text
+request_timing_metric {
+	label vhost mydomain.com
+	label path {http.request.uri.path}
+	match status 200
+}
+
+response_size_metric {
+	label vhost mydomain.com
+	label status {http.response.status_code}
+}
+```
+
+[metrics]: https://caddyserver.com/docs/caddyfile/directives/metrics
+
+#### Parameters
+
+**label**
+
+Attach a label to the observation of each request. `label` can be specified
+multiple times to attach more than one label. `label` values can contain
+placeholders, and the following placeholders are made available in this handler:
+
+* `http.response.header.<header name>`
+* `http.response.status_code`
+
+**buckets**
+
+Example: `buckets 1 4 8 16`
+
+Can be given to specify the histogram buckets to use. If not provided then a
+sane default will be used for each metric.
+
+**match**
+
+A [response matcher][respMatcher] which can be used to only record metrics for
+requests whose response has particular characteristics.
+
+[respMatcher]: https://caddyserver.com/docs/caddyfile/response-matchers
 
 ### http.handlers.templates.functions.gemtext_function
 

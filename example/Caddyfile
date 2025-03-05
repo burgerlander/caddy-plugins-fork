@@ -3,6 +3,13 @@
 	admin off
 	auto_https off
 	http_port 8000
+	servers {
+		metrics
+	}
+}
+
+http://metrics.localhost {
+	metrics
 }
 
 http://git-remote-repo.localhost {
@@ -29,6 +36,16 @@ http://git-remote-repo.localhost {
 
 http://gemtext.localhost {
 	root example/gemtext/static
+
+	request_timing_metric {
+		label path {http.request.uri.path}
+		match status 200
+	}
+
+	response_size_metric {
+		label path {http.request.uri.path}
+		match status 200
+	}
 
 	# Allow for either index.html or index.gmi files when serving directories
 	try_files {path} {path}/index.html {path}/index.gmi
