@@ -6,6 +6,19 @@
 	servers {
 		metrics
 	}
+
+	mediocre_caddy_plugins {
+		metrics {
+			histogram "custom_request_timing" {
+				labels path
+			}
+
+			histogram "custom_response_size" {
+				labels path
+				buckets 256 1024 4096 16384 65536 262144 1048576 4194304
+			}
+		}
+	}
 }
 
 http://metrics.localhost {
@@ -37,12 +50,12 @@ http://git-remote-repo.localhost {
 http://gemtext.localhost {
 	root example/gemtext/static
 
-	request_timing_metric {
+	request_timing_metric "custom_request_timing" {
 		label path {http.request.uri.path}
 		match status 200
 	}
 
-	response_size_metric {
+	response_size_metric "custom_response_size" {
 		label path {http.request.uri.path}
 		match status 200
 	}

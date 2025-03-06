@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
+	"dev.mediocregopher.com/mediocre-caddy-plugins.git/global"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
@@ -19,14 +19,16 @@ const metricsNamespace = "mediocre_caddy_plugins_http"
 // RequestResponseHistogramMetric contains common fields and logic for metrics
 // which record HTTP request/response data into a hisogram.
 type RequestResponseHistogramMetric struct {
-	// Labels will be included as the labels on all measurements made to the
-	// metric. The label values may have placeholders in them, but the keys may
-	// not.
-	Labels map[string]string `json:"labels,omitempty"`
+	// Name refers to the name of a histogram defined as part of the
+	// `mediocre_caddy_plugins.metrics` global configuration. It is using this
+	// histogram which values will be observed.
+	Name string `json:"name"`
 
-	// Buckets will be used as the buckets of the histogram. The default depends
-	// on the metric itself.
-	Buckets []float64 `json:"buckets,omitempty"`
+	// Labels will be included as the labels on all measurements made to the
+	// metric. The label keys must match 1:1 with the labels defined in the
+	// global config for the histogram. The label values may have placeholders
+	// in them, but the keys may not.
+	Labels map[string]string `json:"labels,omitempty"`
 
 	// Only observe the value when the response matches against this
 	// ResponseMatcher. The default is to always observe the value.
@@ -36,31 +38,23 @@ type RequestResponseHistogramMetric struct {
 	hasPlaceholders bool
 }
 
-func (m *RequestResponseHistogramMetric) provision(
-	ctx caddy.Context, defaultBuckets []float64, metricName string,
-) error {
-	if m.Buckets == nil {
-		m.Buckets = defaultBuckets
-	}
-
-	m.histogram = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Namespace: metricsNamespace,
-			Name:      metricName,
-			Buckets:   m.Buckets,
-		},
-		maps.Keys(m.Labels),
-	)
-
-	if err := ctx.GetMetricsRegistry().Register(m.histogram); err != nil {
-		return fmt.Errorf("registering request timing histogram: %w", err)
-	}
-
+func (m *RequestResponseHistogramMetric) Provision(ctx caddy.Context) error {
 	for _, v := range m.Labels {
 		if strings.Contains(v, "{") && strings.Contains(v, "}") {
 			m.hasPlaceholders = true
 			break
 		}
+	}
+
+	appI, err := ctx.AppIfConfigured("mediocre_caddy_plugins")
+	if err != nil {
+		return err
+	}
+	app := appI.(*global.App)
+
+	var ok bool
+	if m.histogram, ok = app.Metrics.HistogramByName(m.Name); !ok {
+		return fmt.Errorf("histogram %q not configured globally", m.Name)
 	}
 
 	return nil
@@ -98,13 +92,14 @@ func (m *RequestResponseHistogramMetric) observe(
 // Caddyfile tokens. Syntax:
 //
 //	request_timing_metric {
+//		name "global_metric_name"
+//
 //		// label can be specified multiple times, its value can have
 //		// placeholders, including the special placeholders:
 //		//	http.response.header.*
 //		//	http.response.status_code
 //		label name value
 //
-//		buckets .005 .01 .025 .05 .1 .25 .5 1 2.5 5 10
 //		match <response matcher>
 //	}
 func requestResponseHistogramMetricParseCaddyfile(
@@ -121,6 +116,11 @@ func requestResponseHistogramMetricParseCaddyfile(
 	)
 
 	h.Next() // consume directive name
+
+	if !h.Args(&m.Name) {
+		return zero, h.ArgErr()
+	}
+
 	for h.NextBlock(0) {
 		switch h.Val() {
 		case "label":
@@ -133,23 +133,6 @@ func requestResponseHistogramMetricParseCaddyfile(
 				return zero, h.ArgErr()
 			}
 			m.Labels[k] = h.Val()
-
-		case "buckets":
-			bucketsStrs := h.RemainingArgs()
-			if len(bucketsStrs) == 0 {
-				return zero, h.ArgErr()
-			}
-
-			for _, bucketStr := range bucketsStrs {
-				bucketStr = strings.TrimSpace(bucketStr)
-				bucket, err := strconv.ParseFloat(bucketStr, 64)
-				if err != nil {
-					return zero, fmt.Errorf(
-						"parsing bucket %q: %w", bucketStr, err,
-					)
-				}
-				m.Buckets = append(m.Buckets, bucket)
-			}
 
 		case "match":
 			if err := caddyhttp.ParseNamedResponseMatcher(

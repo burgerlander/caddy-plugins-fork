@@ -249,24 +249,53 @@ and reload the page.
 
 ### http.handlers.{request_timing_metric, response_size_metric}
 
-These modules which will passthrough all requests untouched, recording their
-timing under the following histograms [metric][metrics].
+Usage of these modules requires histograms to be defined under the
+`mediocre_caddy_plugins.metrics` global option set. Example:
 
-* `mediocre_caddy_plugins_http_request_seconds`
-* `mediocre_caddy_plugins_http_response_bytes`
+```text
+// top-level options block, where directives like 'admin' and 'debug' go.
+{
+	mediocre_caddy_plugins {
+		metrics {
+			histogram custom_request_seconds {
+				// All fields inside the block are optional
+				help "Optional description of the metric"
+
+				// Buckets defaults to this set of thresholds if not given
+				buckets 0.005 0.01 0.025 0.05 0.1 0.25 0.5 1 2.5 5 10
+
+				labels vhost path
+			}
+
+			histogram custom_response_bytes {
+				buckets 256 1024 4096 16384 65536 262144 1048576 4194304
+				labels vhost status
+			}
+		}
+	}
+}
+```
+
+These modules, which are used within an address block, will then passthrough all
+requests untouched, recording their timing/response size under the histogram
+[metric][metrics] referenced by name in the global options.
 
 Example Usage:
 
 ```text
-request_timing_metric {
-	label vhost mydomain.com
-	label path {http.request.uri.path}
-	match status 200
-}
+mydomain.com {
+	request_timing_metric "custom_request_seconds" {
+		label vhost mydomain.com
+		label path {http.request.uri.path}
+		match status 200
+	}
 
-response_size_metric {
-	label vhost mydomain.com
-	label status {http.response.status_code}
+	response_size_metric "custom_response_bytes" {
+		label vhost mydomain.com
+		label status {http.response.status_code}
+	}
+
+	# ...
 }
 ```
 
@@ -277,18 +306,15 @@ response_size_metric {
 **label**
 
 Attach a label to the observation of each request. `label` can be specified
-multiple times to attach more than one label. `label` values can contain
-placeholders, and the following placeholders are made available in this handler:
+multiple times to attach more than one label, and there must be the exact same
+set of labels within the metric as are defined in the globally defined
+histogram.
+
+`label` values can contain placeholders, and the following placeholders are made
+available in this handler:
 
 * `http.response.header.<header name>`
 * `http.response.status_code`
-
-**buckets**
-
-Example: `buckets 1 4 8 16`
-
-Can be given to specify the histogram buckets to use. If not provided then a
-sane default will be used for each metric.
 
 **match**
 

@@ -25,25 +25,13 @@ type RequestTimingMetric struct {
 	RequestResponseHistogramMetric
 }
 
-var (
-	_ caddyhttp.MiddlewareHandler = (*RequestTimingMetric)(nil)
-
-	requestTimingMetricDefaultBuckets = []float64{
-		.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10,
-	}
-)
+var _ caddyhttp.MiddlewareHandler = (*RequestTimingMetric)(nil)
 
 func (RequestTimingMetric) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
 		ID:  "http.handlers.request_timing_metric",
 		New: func() caddy.Module { return new(RequestTimingMetric) },
 	}
-}
-
-func (m *RequestTimingMetric) Provision(ctx caddy.Context) error {
-	return m.provision(
-		ctx, requestTimingMetricDefaultBuckets, "request_seconds",
-	)
 }
 
 func (m *RequestTimingMetric) ServeHTTP(

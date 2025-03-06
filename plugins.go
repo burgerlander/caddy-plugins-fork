@@ -3,6 +3,7 @@
 package mediocrecaddyplugins
 
 import (
+	_ "dev.mediocregopher.com/mediocre-caddy-plugins.git/global"
 	_ "dev.mediocregopher.com/mediocre-caddy-plugins.git/http/handlers"
 	_ "dev.mediocregopher.com/mediocre-caddy-plugins.git/http/handlers/templates/functions"
 )

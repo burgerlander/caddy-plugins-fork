@@ -7,7 +7,6 @@ import (
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 func init() {
@@ -25,23 +24,13 @@ type ResponseSizeMetric struct {
 	RequestResponseHistogramMetric
 }
 
-var (
-	_ caddyhttp.MiddlewareHandler = (*ResponseSizeMetric)(nil)
-
-	responseSizeMetricDefaultBuckets = prometheus.ExponentialBuckets(256, 4, 8)
-)
+var _ caddyhttp.MiddlewareHandler = (*ResponseSizeMetric)(nil)
 
 func (ResponseSizeMetric) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
 		ID:  "http.handlers.response_size_metric",
 		New: func() caddy.Module { return new(ResponseSizeMetric) },
 	}
-}
-
-func (m *ResponseSizeMetric) Provision(ctx caddy.Context) error {
-	return m.provision(
-		ctx, responseSizeMetricDefaultBuckets, "response_bytes",
-	)
 }
 
 func (m *ResponseSizeMetric) ServeHTTP(
