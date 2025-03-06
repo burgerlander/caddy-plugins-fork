@@ -253,15 +253,17 @@ Usage of these modules requires histograms to be defined under the
 `mediocre_caddy_plugins.metrics` global option set. Example:
 
 ```text
-// top-level options block, where directives like 'admin' and 'debug' go.
+# top-level options block, where directives like 'admin' and 'debug' go.
 {
 	mediocre_caddy_plugins {
 		metrics {
+			# Metric names can be arbitrary, they are only used within address
+			# blocks to refer back to the metrics
 			histogram custom_request_seconds {
-				// All fields inside the block are optional
+				# All fields inside the block are optional
 				help "Optional description of the metric"
 
-				// Buckets defaults to this set of thresholds if not given
+				# buckets defaults to this set of thresholds if not given
 				buckets 0.005 0.01 0.025 0.05 0.1 0.25 0.5 1 2.5 5 10
 
 				labels vhost path
