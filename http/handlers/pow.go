@@ -28,6 +28,10 @@ func init() {
 	)
 }
 
+const (
+	powSolutionRequiredHeaderName = "X-POW-Solution-Required"
+)
+
 var (
 	//go:embed pow.js
 	powJS string
@@ -212,6 +216,8 @@ func (p *ProofOfWork) ServeHTTP(
 		zap.String("url", r.URL.String()),
 		zap.Error(err),
 	)
+
+	rw.Header().Set(powSolutionRequiredHeaderName, "true")
 
 	tplPath := ""
 	if p.TemplatePath != "" {

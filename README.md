@@ -183,6 +183,9 @@ The objective of this middleware is to allow normal users to continue using a
 website, while trying to prevent search engine crawlers, denial-of-service
 attacks, and AI scrapers from getting through.
 
+The `X-POW-Solution-Required` response header will be set to `true` when the
+challenge page is being presented.
+
 Example Usage:
 
 ```text
