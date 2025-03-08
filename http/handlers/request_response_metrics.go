@@ -81,7 +81,7 @@ func (m *RequestResponseHistogramMetric) observe(
 		repl.Set("http.response.status_code", status)
 
 		for k, v := range labels {
-			labels[k] = repl.ReplaceAll(v, "malformed_placeholder")
+			labels[k] = repl.ReplaceAll(v, "")
 		}
 	}
 
