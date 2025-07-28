@@ -1,4 +1,4 @@
-module dev.mediocregopher.com/mediocre-caddy-plugins.git
+module github.com/burgerlander/caddy-plugins-fork
 
 go 1.22.3
 
